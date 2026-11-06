@@ -168,7 +168,7 @@ abstract class ezcLogFileWriter implements ezcLogWriter
             $failure = false;
             foreach ( $fileHandles as $filename => $fh )
             {
-                if ( fwrite( $fh, $string ) === false )
+                if ( !is_resource( $fh ) || fwrite( $fh, $string ) === false )
                 {
                     $failure = $filename;
                 }
@@ -185,7 +185,7 @@ abstract class ezcLogFileWriter implements ezcLogWriter
             if ( !is_null( $this->defaultFile ) )
             {
                 $path = $this->logDirectory . "/". $this->defaultFile;
-                if ( fwrite( $this->openFiles[$path], $string ) === false )
+                if ( !is_resource( $this->openFiles[$path] ) || fwrite( $this->openFiles[$path], $string ) === false )
                 {
                     throw new ezcLogWriterException( new ezcBaseFileIoException( $this->defaultFile, ezcBaseFileIoException::WRITE ) );
                 }
