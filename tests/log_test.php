@@ -25,6 +25,8 @@
  * @subpackage Tests
  */
 
+require_once __DIR__ . '/test_classes.php';
+
 /**
  * @package EventLog
  * @subpackage Tests
@@ -48,7 +50,7 @@ class ezcLogTest extends ezcTestCase
         // $this->removeTempDir();
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         set_error_handler(array( $this, "TestErrorHandler"));
         $this->log = ezcLog::getInstance();
@@ -56,7 +58,7 @@ class ezcLogTest extends ezcTestCase
         $this->createTempDir( "ezcLogTest_" );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         // $this->cleanTempDir();
         $this->removeTempDir();
@@ -90,7 +92,7 @@ class ezcLogTest extends ezcTestCase
 
         $regExp = "/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+ \d+:\d+:\d+ \[Debug\] \[ezComponents Log\] \[Testing\] Writing a simple message. \(file: myFile, line: myLine\)/";
 
-        $this->assertRegExp( $regExp, file_get_contents( $this->getTempDir() . "/default.log") );
+        $this->assertMatchesRegularExpression( $regExp, file_get_contents( $this->getTempDir() . "/default.log") );
     }
 
     public function testMultipleWriters()
@@ -111,13 +113,13 @@ class ezcLogTest extends ezcTestCase
 
         $regExp = "/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+ \d+:\d+:\d+ \[Debug\] \[ezComponents Log\] \[Testing\] Bernard, float over here so I can punch you. \(file: myFile, line: myLine\)/";
 
-        $this->assertRegExp($regExp, file_get_contents( $this->getTempDir() . "/logging.log") );
+        $this->assertMatchesRegularExpression($regExp, file_get_contents( $this->getTempDir() . "/logging.log") );
 
         $this->log->log("To save the world, you have to push a few old ladies down the stairs", ezcLog::SUCCESS_AUDIT, array( "source" => "ezComponents Log", "category" => "Testing", "file" => "myFile", "line" => "myLine") );
 
         $regExp2 = "/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d+ \d+:\d+:\d+ \[Success audit\] \[ezComponents Log\] \[Testing\] To save the world, you have to push a few old ladies down the stairs \(file: myFile, line: myLine\)/";
-        $this->assertNotRegExp($regExp2, file_get_contents( $this->getTempDir() . "/logging.log") ); // Not in this log.
-        $this->assertRegExp($regExp2, file_get_contents( $this->getTempDir() . "/auditing.log") );   // But in this one.
+        $this->assertDoesNotMatchRegularExpression($regExp2, file_get_contents( $this->getTempDir() . "/logging.log") ); // Not in this log.
+        $this->assertMatchesRegularExpression($regExp2, file_get_contents( $this->getTempDir() . "/auditing.log") );   // But in this one.
     }
 
     public function testReAttach()
@@ -236,7 +238,7 @@ class ezcLogTest extends ezcTestCase
 //        trigger_error("Bernard, looking at all the quarters that fell out of the vending machine he broke with the crowbar.", E_USER_WARNING);
 //
 //        $regExp = "|\[Warning\] \[default\] \[default\] Bern.* \(file: .*/log_test.php, line: \d+\)|";
-//        $this->assertRegExp($regExp, file_get_contents( $this->getTempDir() . "/default.log") );
+//        $this->assertMatchesRegularExpression($regExp, file_get_contents( $this->getTempDir() . "/default.log") );
 //
 //        ezcLog::getInstance()->source = "Hoagie";
 //        ezcLog::getInstance()->category = "Male";
@@ -244,10 +246,10 @@ class ezcLogTest extends ezcTestCase
 //
 //        $lines = file( $this->getTempDir() . "/default.log");
 //
-//        $this->assertNotRegExp($regExp, $lines[count($lines) - 1] );
+//        $this->assertDoesNotMatchRegularExpression($regExp, $lines[count($lines) - 1] );
 //
 //        $regExp = "|\[Warning\] \[Hoagie\] \[Male\] Bernard|"; 
-//        $this->assertRegExp($regExp, $lines[count($lines) - 1] );
+//        $this->assertMatchesRegularExpression($regExp, $lines[count($lines) - 1] );
 //    }
 
     /*
@@ -347,13 +349,13 @@ class ezcLogTest extends ezcTestCase
         $this->log->log("Error", ezcLog::ERROR, array( "source" => "administration interface", "category" => "security", "line" => "100", "file" => "bla") );
         $lines = file( $this->getTempDir() . "/default.log");
 
-        $this->assertRegExp("/Error/", $lines[0]);
-        $this->assertRegExp("/administration interface/", $lines[0]);
-        $this->assertRegExp("/security/", $lines[0]);
-        $this->assertRegExp("/line/", $lines[0]);
-        $this->assertRegExp("/100/", $lines[0]);
-        $this->assertRegExp("/file/", $lines[0]);
-        $this->assertRegExp("/bla/", $lines[0]);
+        $this->assertMatchesRegularExpression("/Error/", $lines[0]);
+        $this->assertMatchesRegularExpression("/administration interface/", $lines[0]);
+        $this->assertMatchesRegularExpression("/security/", $lines[0]);
+        $this->assertMatchesRegularExpression("/line/", $lines[0]);
+        $this->assertMatchesRegularExpression("/100/", $lines[0]);
+        $this->assertMatchesRegularExpression("/file/", $lines[0]);
+        $this->assertMatchesRegularExpression("/bla/", $lines[0]);
 
         $db->exec("DROP TABLE `audits`");
     }
@@ -361,24 +363,19 @@ class ezcLogTest extends ezcTestCase
 
     public function testException()
     {
-        try
-        {
-            $db = ezcDbInstance::get();
-        }
-        catch ( Exception $e )
-        {
-            $this->markTestSkipped( 'There is no database configured.' );
-        }
-
+        // Upstream used ezcLogDatabaseWriter (EventLogDatabaseTiein) on a table
+        // that does not exist; any writer that fails tests the same path.
         $this->log->reset();
-        $this->log->getMapper()->appendRule( new ezcLogFilterRule(  new ezcLogFilter, $writer = new ezcLogDatabaseWriter( $db,  "log" ), true ) );
+        $this->log->getMapper()->appendRule( new ezcLogFilterRule(  new ezcLogFilter, $writer = new testFailingLogWriter(), true ) );
 
         try
         {
             $this->log->log( "msg", ezcLog::WARNING, array( "source" => "src", "category" => "cat" ) );
-        } 
+        }
         catch ( ezcLogWriterException $e )
         {
+            $this->assertSame( 1, $writer->attempts );
+            $this->assertSame( "Cannot write 'msg'.", $e->getMessage() );
             return;
         }
         $this->fail("Expected an ezcLogWriterException.");
@@ -386,29 +383,22 @@ class ezcLogTest extends ezcTestCase
 
     public function testDisableExceptions()
     {
-        try
-        {
-            $db = ezcDbInstance::get();
-        }
-        catch ( Exception $e )
-        {
-            $this->markTestSkipped( 'There is no database configured.' );
-        }
-
         $this->log->reset();
-        $this->log->getMapper()->appendRule( new ezcLogFilterRule( new ezcLogFilter, $writer = new ezcLogDatabaseWriter( $db, "log" ), true ) );
+        $this->log->getMapper()->appendRule( new ezcLogFilterRule( new ezcLogFilter, $writer = new testFailingLogWriter(), true ) );
         $this->log->throwWriterExceptions( false );
 
         try
         {
             $this->log->log( "msg", ezcLog::WARNING, array( "source" => "src", "category" => "cat" ) );
-        } 
+        }
         catch ( ezcLogWriterException $e )
         {
+            $this->log->throwWriterExceptions( true );
             $this->fail( "Didn't expect an ezcLogWriterException." );
         }
         // re-enable writer exceptions
         $this->log->throwWriterExceptions( true );
+        $this->assertSame( 1, $writer->attempts, 'the writer was called and its failure ignored' );
     }
 
     /*
@@ -459,13 +449,13 @@ class ezcLogTest extends ezcTestCase
         $this->log->log("Error", ezcLog::ERROR, array( "source" => "administration interface", "category" => "security", "line" => "100", "file" => "bla" ));
         $lines = file( $this->getTempDir() . "/default.log");
 
-        $this->assertRegExp("/Error/", $lines[0]);
-        $this->assertRegExp("/administration interface/", $lines[0]);
-        $this->assertRegExp("/security/", $lines[0]);
-        $this->assertRegExp("/line/", $lines[0]);
-        $this->assertRegExp("/100/", $lines[0]);
-        $this->assertRegExp("/file/", $lines[0]);
-        $this->assertRegExp("/bla/", $lines[0]);
+        $this->assertMatchesRegularExpression("/Error/", $lines[0]);
+        $this->assertMatchesRegularExpression("/administration interface/", $lines[0]);
+        $this->assertMatchesRegularExpression("/security/", $lines[0]);
+        $this->assertMatchesRegularExpression("/line/", $lines[0]);
+        $this->assertMatchesRegularExpression("/100/", $lines[0]);
+        $this->assertMatchesRegularExpression("/file/", $lines[0]);
+        $this->assertMatchesRegularExpression("/bla/", $lines[0]);
 
         $db->exec("DROP TABLE `audits`");
     }
@@ -519,12 +509,12 @@ class ezcLogTest extends ezcTestCase
 
         $lines = file( "$dir/$file" );
 
-        $this->assertRegExp("/username: John Doe/", $lines[0]);
+        $this->assertMatchesRegularExpression("/username: John Doe/", $lines[0]);
 
-        $this->assertRegExp("/service: Paynet Terminal/", $lines[1]);
+        $this->assertMatchesRegularExpression("/service: Paynet Terminal/", $lines[1]);
 
-        $this->assertRegExp("/username: John Doe/", $lines[2]);
-        $this->assertRegExp("/service: Paynet Terminal/", $lines[2]);
+        $this->assertMatchesRegularExpression("/username: John Doe/", $lines[2]);
+        $this->assertMatchesRegularExpression("/service: Paynet Terminal/", $lines[2]);
     }
 
     public function testOtherSeverities()
@@ -544,7 +534,7 @@ class ezcLogTest extends ezcTestCase
         $log->log( "Something unknown happened...", false, array( "source" => "security", "category" => "login" ) );
 
         $lines = file( "$dir/$file" );
-        $this->assertRegExp("/username: John Doe/", $lines[0]);
+        $this->assertMatchesRegularExpression("/username: John Doe/", $lines[0]);
     }
 
     public function testProperties()
@@ -584,7 +574,7 @@ class ezcLogTest extends ezcTestCase
 
     public static function suite()
     {
-         return new PHPUnit_Framework_TestSuite("ezcLogTest");
+         return new \PHPUnit\Framework\TestSuite("ezcLogTest");
     }
 }
 ?>

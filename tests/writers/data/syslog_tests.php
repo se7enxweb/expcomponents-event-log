@@ -24,11 +24,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
-require dirname( __FILE__ ) . '/../../../../Base/src/base.php';
-function __autoload( $className )
-{
-    ezcBase::autoload( $className );
-}
+require dirname( __FILE__ ) . '/../../../vendor/autoload.php';
 
 $writer = new ezcLogSyslogWriter( "ezctest", LOG_PERROR|LOG_PID|LOG_ODELAY );
 

@@ -35,10 +35,10 @@ class ezcLogMessageTest extends ezcTestCase
     
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite("ezcLogMessageTest");
+        return new \PHPUnit\Framework\TestSuite("ezcLogMessageTest");
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tm = new TestMessages();
     }

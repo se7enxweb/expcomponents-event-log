@@ -25,7 +25,7 @@
  * @subpackage Tests
  */
 
-require_once( "test_classes.php" );
+require_once __DIR__ . "/test_classes.php";
 
 /**
  * @package Log
@@ -47,7 +47,7 @@ class ezcLogDelayedInitTest extends ezcTestCase
 
     public static function suite()
     {
-        return new PHPUnit_Framework_TestSuite("ezcLogDelayedInitTest");
+        return new \PHPUnit\Framework\TestSuite("ezcLogDelayedInitTest");
     }
 }
 

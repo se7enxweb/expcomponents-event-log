@@ -34,12 +34,12 @@ class ezcLogSyslogWriterTest extends ezcTestCase
     protected $writer;
     protected $stderr;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->writer = new ezcLogSyslogWriter( "ezctest", LOG_PID|LOG_ODELAY );
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         closelog();
     }
@@ -48,7 +48,7 @@ class ezcLogSyslogWriterTest extends ezcTestCase
     public function testExternalTest()
     {
         $dataDir = dirname( __FILE__ ) . "/data";
-        $phpPath = isset( $_SERVER["_"] ) ? $_SERVER["_"] : "/bin/env php";
+        $phpPath = PHP_BINARY;
         $scriptFile = "{$dataDir}/syslog_tests.php";
         $desc = array(
             0 => array( "pipe", "r" ),  // stdin
@@ -69,29 +69,29 @@ class ezcLogSyslogWriterTest extends ezcTestCase
         $strings = explode( "\n", $ret );
         // check each of the strings for correctness
         $regExp = "/ezctest\S*: \[Debug\] \[Donny\] \[quotes\] I was bowling. \(movie: The Big Lebowski\)/";
-        $this->assertRegExp( $regExp, $strings[0] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[0] );
 
         $regExp = "/ezctest\S*: \[Debug\] \[Lebowski\] \[quotes\] The dude abides./";
-        $this->assertRegExp( $regExp, $strings[1] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[1] );
 
         $regExp = "/ezctest\S*: \[Success audit\] \[Maude\] \[quotes\] Don't be fatuous, Jeffrey./";
-        $this->assertRegExp( $regExp, $strings[2] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[2] );
 
         $regExp = "/ezctest\S*: \[Failed audit\] \[Lebowski\] \[quotes\] Also, my rug was stolen./";
-        $this->assertRegExp( $regExp, $strings[3] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[3] );
 
         $regExp = "/ezctest\S*: \[Info\] \[Lebowski\] \[quotes\] Obviously you're not a golfer./";
-        $this->assertRegExp( $regExp, $strings[4] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[4] );
 
         $regExp = "/ezctest\S*: \[Notice\] \[Walter\] \[quotes\] Forget it, Donny, you're out of your element!/";
-        $this->assertRegExp( $regExp, $strings[5] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[5] );
 
 
         $regExp = "/ezctest\S*: \[Failed audit\] \[Walter\] \[quotes\] Donny you're out of your element! Dude, the Chinaman is not the issue here!/";
-        $this->assertRegExp( $regExp, $strings[6] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[6] );
 
         $regExp = "/ezctest\S*: \[Fatal\] \[The stranger\] \[quotes\] Ok, Dude. Have it your way./";
-        $this->assertRegExp( $regExp, $strings[7] );
+        $this->assertMatchesRegularExpression( $regExp, $strings[7] );
     }
 
 
@@ -103,50 +103,66 @@ class ezcLogSyslogWriterTest extends ezcTestCase
      */
     public function testExtras()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "I was bowling.", ezcLog::DEBUG, "Donny", "quotes",
                                         array( "movie" => "The Big Lebowski" ) );
     }
 
     public function testDebug()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "The dude abides.", ezcLog::DEBUG, "Lebowski", "quotes" );
     }
 
     public function testSuccessAudit()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "Don't be fatuous, Jeffrey.", ezcLog::SUCCESS_AUDIT, "Maude", "quotes" );
     }
 
     public function testFailAudit()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "Also, my rug was stolen.", ezcLog::FAILED_AUDIT, "Lebowski", "quotes" );
     }
 
     public function testInfo()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "Obviously you're not a golfer.", ezcLog::INFO, "Lebowski", "quotes" );
     }
 
     public function testNotice()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "Forget it, Donny, you're out of your element!",
                                         ezcLog::NOTICE, "Walter", "quotes" );
     }
 
     public function testWarning()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "Donny you're out of your element! Dude, the Chinaman is not the issue here!",
                                         ezcLog::FAILED_AUDIT, "Walter", "quotes" );
     }
 
     public function testFatal()
     {
+        // Runs for errors only; testExternalTest() checks the syslog output.
+        $this->expectNotToPerformAssertions();
         $this->writer->writeLogMessage( "Ok, Dude. Have it your way.", ezcLog::FATAL, "The stranger", "quotes" );
     }
 
     public static function suite()
 	{
-		return new PHPUnit_Framework_TestSuite("ezcLogSyslogWriterTest");
+		return new \PHPUnit\Framework\TestSuite("ezcLogSyslogWriterTest");
 	}
 }
 

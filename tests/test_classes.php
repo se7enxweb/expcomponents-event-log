@@ -31,4 +31,19 @@ class testDelayedInitLog implements ezcBaseConfigurationInitializer
         $object->getMapper()->appendRule( new ezcLogFilterRule( new ezcLogFilter(), $writer = new ezcLogUnixFileWriter( '/' ), true) );
     }
 }
+
+/**
+ * A writer that cannot write: every message raises ezcLogWriterException,
+ * as a writer does whose storage fails (a database, a full disk).
+ */
+class testFailingLogWriter implements ezcLogWriter
+{
+    public $attempts = 0;
+
+    public function writeLogMessage( $message, $severity, $source, $category, $optional = array() )
+    {
+        ++$this->attempts;
+        throw new ezcLogWriterException( new Exception( "Cannot write '{$message}'." ) );
+    }
+}
 ?>

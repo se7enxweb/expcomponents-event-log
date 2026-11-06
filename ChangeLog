@@ -13,6 +13,9 @@ Unreleased - se7enxweb/expcomponents-event-log
 - Added: NOTICE keeps the upstream copyright notices and names the fork;
   README.md describes the fork.
 - Added: A GitHub Actions workflow running the test suite on PHP 7.4 to 8.5.
+- Fixed: On PHP 8, ezcLogFileWriter threw a TypeError instead of
+  ezcLogWriterException when a log file's handle was no longer open.
+- Updated: The test suite runs on PHPUnit 9.
 
 
 1.5 - Saturday 27 September 2014

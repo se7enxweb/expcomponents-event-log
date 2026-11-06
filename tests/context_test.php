@@ -33,7 +33,7 @@ class ezcLogContextTest extends ezcTestCase
 {
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new ezcLogContext();
     }
@@ -193,7 +193,7 @@ class ezcLogContextTest extends ezcTestCase
 
 	public static function suite()
 	{
-		return new PHPUnit_Framework_TestSuite("ezcLogContextTest");
+		return new \PHPUnit\Framework\TestSuite("ezcLogContextTest");
 	}
 }
 
