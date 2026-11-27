@@ -2,7 +2,7 @@
 
 Allows you to log events or audit trails into files or other storage spaces in different formats.
 
-This is the Exponential fork of [zetacomponents/EventLog](https://github.com/zetacomponents/EventLog),
+This is the Exponential Components fork of [zetacomponents/EventLog](https://github.com/zetacomponents/EventLog),
 maintained by 7x (se7en.x) and the Exponential Foundation for Exponential and anyone else
 who uses the Zeta Components EventLog component on current PHP versions. All credit for the
 component goes to the Zeta Components authors listed in `composer.json` and `CREDITS`;
